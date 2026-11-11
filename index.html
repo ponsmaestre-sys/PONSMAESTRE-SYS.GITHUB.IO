@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d0c">
+<title>Taller · villacreces competición</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#0b0d0c;--card:#151917;--ink:#eef2ee;--mut:#8f9993;--line:#2a312d;--acc:#3dfd24;
+--pendiente:#8a9094;--en_curso:#2f7de1;--esperando_piezas:#e07a1f;--listo:#2e9b5b;--entregado:#7d8782}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Barlow,system-ui,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+h1,h2,button,.tag,label{font-family:"Barlow Semi Condensed",system-ui,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:16px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+h1{font-size:26px;margin:0;font-weight:700;border-left:6px solid var(--acc);padding-left:10px}
+button,select,input,textarea{font:inherit;color:inherit}
+button{background:var(--ink);color:var(--bg);border:0;border-radius:6px;padding:10px 14px;font-weight:600;cursor:pointer}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button.acc{background:var(--acc);color:#06150b}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--en_curso);outline-offset:1px}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--card)}
+.filtros{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:4px}
+.filtros button{white-space:nowrap}
+.filtros button.on{background:var(--acc);color:#06150b;border-color:var(--acc)}
+.fila{display:block;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-left:8px solid var(--c);border-radius:6px;padding:12px;margin-bottom:8px}
+.fila b{font-family:"Barlow Semi Condensed";font-size:19px}
+.fila small{color:var(--mut);display:block}
+.tag{font-size:14px;font-weight:600;color:var(--c)}
+.row{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.box{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:12px}
+.tarea{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.tarea input{width:26px;height:26px;flex:none}
+.tarea.ok span{text-decoration:line-through;color:var(--mut)}
+.tarea small{color:var(--mut);margin-left:auto}
+.vacio{color:var(--mut);text-align:center;padding:28px 0}
+.err{color:#ff6b6b;min-height:1.3em}
+dialog{border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);width:min(440px,92vw);padding:18px}
+dialog::backdrop{background:#0008}
+dialog label{display:block;margin:10px 0 4px;font-weight:600}
+.btns{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+.add{display:flex;gap:8px;margin-top:12px}
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto}.tabs button{flex:1 0 auto;white-space:nowrap;background:transparent;color:var(--ink);border:1px solid var(--line)}.tabs button.on{background:var(--acc);color:#06150b;border-color:var(--acc)}
+.al{background:#d23b3b;color:#fff;border-radius:10px;padding:0 7px;margin-left:4px}
+.aviso{background:#d23b3b22;border:1px solid #d23b3b;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-weight:600}
+.pieza{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.pieza small{display:block}
+.pieza img,.sinfoto{width:76px;height:76px;object-fit:cover;border-radius:6px;flex:none;background:var(--line);cursor:pointer}
+.warn{color:var(--esperando_piezas)}.bad{color:#ff6b6b}.oks{color:var(--listo)}
+.lin{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:end}.lin label{flex:1;font-weight:600}
+.tot{display:flex;justify-content:space-between;padding:3px 0}
+.marca{display:flex;align-items:center;gap:12px}.logo{width:min(220px,46vw);height:auto}.logo.grande{width:min(340px,100%);display:block;margin:0 auto 16px}
+.reloj{font:700 44px 'Barlow Semi Condensed',sans-serif;color:var(--acc);margin:4px 0 8px;font-variant-numeric:tabular-nums}
+.hfoto{max-width:100%;max-height:220px;border-radius:6px;margin-top:6px;cursor:pointer}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}.cal b{font:600 13px 'Barlow Semi Condensed',sans-serif;color:var(--mut)}
+.cal button{padding:6px 0;min-height:46px;background:var(--card);color:var(--ink);border:1px solid var(--line)}.cal button.hoy{border-color:var(--acc)}.cal button.sel{background:var(--acc);color:#06150b}
+.cal .p{display:flex;gap:3px;justify-content:center;margin-top:3px;height:6px}.cal .p i{width:6px;height:6px;border-radius:50%;background:var(--en_curso)}.cal .p i.t{background:var(--esperando_piezas)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<dialog id="dlg">
+  <form method="dialog" id="fnuevo">
+    <h2 style="margin:0">Entra al taller</h2>
+    <label for="n_tipo">Tipo</label>
+    <select id="n_tipo"><option value="coche">Coche</option><option value="motor">Motor</option></select>
+    <label for="n_nombre">Marca y modelo</label><input id="n_nombre" required placeholder="Ej. Peugeot 106 Rallye">
+    <label for="n_mat">Matrícula (opcional)</label><input id="n_mat">
+    <label for="n_cli">Cliente / piloto (opcional)</label><input id="n_cli">
+    <div class="btns"><button type="button" class="sec" id="n_cancel">Cancelar</button><button class="acc">Guardar</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlga">
+  <form method="dialog" id="fnuevoa">
+    <h2 style="margin:0">Pieza nueva en el almacén</h2>
+    <label for="a_nom">Nombre</label><input id="a_nom" required>
+    <label for="a_ref">Referencia (opcional)</label><input id="a_ref">
+    <label for="a_ubi">Ubicación (opcional)</label><input id="a_ubi" placeholder="Estantería 2, balda 3">
+    <label for="a_uni">Unidades</label><input id="a_uni" type="number" min="0" value="0">
+    <label for="a_min">Avisar cuando queden…</label><input id="a_min" type="number" min="0" value="1">
+    <label for="a_pre">Precio de venta por unidad (€)</label><input id="a_pre" type="number" min="0" step="0.01" value="0">
+    <div class="btns"><button type="button" class="sec" id="a_cancel">Cancelar</button><button class="acc">Guardar</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlgf">
+  <form method="dialog" id="fnuevof">
+    <h2 style="margin:0">Vehículo de asistencia</h2>
+    <label for="f_nom">Nombre</label><input id="f_nom" required placeholder="Ej. Furgoneta Transit">
+    <label for="f_tipo">Tipo</label><select id="f_tipo"><option>Furgoneta</option><option>Remolque</option><option>Coche</option><option>Camión</option><option>Otro</option></select>
+    <label for="f_mat">Matrícula (opcional)</label><input id="f_mat">
+    <label for="f_km">Kilómetros (opcional)</label><input id="f_km" type="number" min="0">
+    <label for="f_itv">Próxima ITV (opcional)</label><input id="f_itv" type="date">
+    <label for="f_seg">Vencimiento del seguro (opcional)</label><input id="f_seg" type="date">
+    <div class="btns"><button type="button" class="sec" id="f_cancel">Cancelar</button><button class="acc">Guardar</button></div>
+  </form>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script>
+// ====== 1) Pega aquí los datos de tu proyecto (Supabase > Project Settings > API) ======
+const SUPABASE_URL = 'https://xgowqywwgelqfgkhizxh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2WBcMj-a3xCXOukow-9lng_1Cfdbj3w';
+// =======================================================================================
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = s => document.querySelector(s);
+const ESTADOS = [['pendiente','Pendiente'],['en_curso','En curso'],['esperando_piezas','Esperando piezas'],['listo','Listo'],['entregado','Entregado']];
+const NOM = Object.fromEntries(ESTADOS);
+const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let me = null, vehs = [], filtro = 'activos', selId = null, tareas = [], timer, vista = 'coche', alm = [], piezas = [], urls = {}, lineas = [], hist = [], fich = [], tarifa = 0, agenda = [], flota = [], fm = [], equipo = [], selFlota = null, mes = new Date(), dia = null;
+
+async function boot() {
+  const { data } = await sb.auth.getSession();
+  data.session ? await entrar(data.session.user) : login();
+  sb.auth.onAuthStateChange((e, s) => { if (e === 'SIGNED_OUT') login(); });
+}
+function login(msg = '') {
+  $('#app').innerHTML = `<div class="box" style="margin-top:12vh"><img src="logo.png" class="logo grande" alt="" onerror="this.remove()"><h1>Taller</h1><p style="color:var(--mut)">villacreces competición</p>
+  <label for="em">Correo</label><input id="em" type="email" autocomplete="username">
+  <label for="pw" style="display:block;margin-top:10px">Contraseña</label><input id="pw" type="password" autocomplete="current-password">
+  <p class="err" id="err">${esc(msg)}</p><button class="acc" id="go" style="width:100%">Entrar</button></div>`;
+  const go = async () => {
+    const { data, error } = await sb.auth.signInWithPassword({ email: $('#em').value.trim(), password: $('#pw').value });
+    error ? $('#err').textContent = 'Correo o contraseña incorrectos.' : entrar(data.user);
+  };
+  $('#go').onclick = go; $('#pw').onkeydown = e => { if (e.key === 'Enter') go(); };
+}
+async function entrar(user) {
+  const { data } = await sb.from('profiles').select('*').eq('id', user.id).single();
+  me = data || { nombre: user.email, rol: 'mecanico' };
+  const eq = await sb.from('profiles').select('nombre'); equipo = (eq.data || []).map(x => x.nombre);
+  sb.channel('taller').on('postgres_changes', { event: '*', schema: 'public' }, () => {
+    clearTimeout(timer); timer = setTimeout(refrescar, 300);
+  }).subscribe();
+  await refrescar();
+}
+async function refrescar() {
+  const [v, a, aj, ag, fl] = await Promise.all([sb.from('vehiculos').select('*, tareas(id,hecha)').order('created_at', { ascending: false }), sb.from('almacen').select('*').order('nombre'), sb.from('ajustes').select('*').eq('clave', 'precio_hora'), sb.from('agenda').select('*').order('fecha').order('hora', { nullsFirst: true }), sb.from('flota').select('*').order('nombre')]);
+  vehs = v.data || []; alm = a.data || []; tarifa = +(aj.data && aj.data[0] && aj.data[0].valor) || 0; agenda = ag.data || []; flota = fl.data || [];
+  if (selId) {
+    await cargarDetalle();
+    // no pisar lo que se está escribiendo
+    if (!document.activeElement || !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) detalle();
+    return;
+  }
+  if (selFlota) { await cargarFlota(); if (!document.activeElement || !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) flotaDetalle(); return; }
+  if (vista === 'agenda' && document.activeElement && ['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+  ({ almacen: almacenView, agenda: agendaView, flota: flotaView }[vista] || lista)();
+}
+async function cargarDetalle() {
+  const q = tb => sb.from(tb).select('*').eq('vehiculo_id', selId);
+  const [t, p, l, h, f] = await Promise.all([q('tareas').order('created_at'), q('piezas').order('created_at'), q('lineas_prefactura').order('created_at'), q('historial').order('created_at', { ascending: false }), q('fichajes').order('inicio')]);
+  tareas = t.data || []; piezas = p.data || []; lineas = l.data || []; hist = h.data || []; fich = f.data || [];
+  const falta = [...piezas, ...hist].map(x => x.foto).filter(f => f && !urls[f]);
+  if (falta.length) { const r = await sb.storage.from('fotos').createSignedUrls(falta, 86400); (r.data || []).forEach(o => { if (o.signedUrl) urls[o.path] = o.signedUrl; }); }
+}
+function cabecera() {
+  const bajos = alm.filter(a => a.unidades <= a.minimo).length, pa = agenda.filter(x => x.tipo === 'tarea' && !x.hecha && x.fecha <= hoyISO()).length, pf = flota.reduce((n, f) => n + ['itv_fecha', 'seguro_fecha'].filter(k => f[k] && dias(f[k]) <= 30).length, 0);
+  return `<header><div class="marca"><img src="logo.png" class="logo" alt="villacreces competición" onerror="this.remove()"><h1>Taller</h1></div><button class="sec" id="salir">Salir</button></header>
+  <nav class="tabs"><button class="${vista==='coche'?'on':''}" data-v="coche">Coches (${vehs.filter(x => x.tipo === 'coche' && x.estado !== 'entregado').length})</button><button class="${vista==='motor'?'on':''}" data-v="motor">Motores (${vehs.filter(x => x.tipo === 'motor' && x.estado !== 'entregado').length})</button><button class="${vista==='almacen'?'on':''}" data-v="almacen">Almacén${bajos ? ` <span class="al">${bajos}</span>` : ''}</button><button class="${vista==='agenda'?'on':''}" data-v="agenda">Agenda${pa ? ` <span class="al">${pa}</span>` : ''}</button><button class="${vista==='flota'?'on':''}" data-v="flota">Flota${pf ? ` <span class="al">${pf}</span>` : ''}</button></nav>
+  ${bajos ? `<div class="aviso">⚠ ${bajos} ${bajos === 1 ? 'pieza con stock bajo' : 'piezas con stock bajo'}</div>` : ''}`;
+}
+function ligar() {
+  document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { vista = b.dataset.v; selId = null; selFlota = null; refrescar(); });
+  $('#salir').onclick = () => sb.auth.signOut();
+}
+function lista() {
+  selId = null;
+  const f = [['activos','En el taller'],['todos','Todos'],...ESTADOS];
+  const vis = vehs.filter(v => v.tipo === vista && (filtro === 'todos' ? true : filtro === 'activos' ? v.estado !== 'entregado' : v.estado === filtro));
+  $('#app').innerHTML = `${cabecera()}<div style="margin-bottom:12px"><button class="acc" id="nuevo">+ Entrada</button></div>
+  <div class="filtros">${f.map(([k,n]) => `<button class="sec ${filtro===k?'on':''}" data-f="${k}">${n}</button>`).join('')}</div>
+  ${vis.length ? vis.map(v => { const t = v.tareas || [], h = t.filter(x => x.hecha).length; return `
+  <button class="fila" style="--c:var(--${v.estado})" data-id="${v.id}">
+    <div class="row"><b>${esc(v.nombre)}</b><span class="tag">${NOM[v.estado]}</span></div>
+    <small>${v.tipo === 'motor' ? 'Motor' : 'Coche'}${v.matricula ? ' · ' + esc(v.matricula) : ''}${v.cliente ? ' · ' + esc(v.cliente) : ''}</small>
+    <small>${t.length ? `Checklist: ${h} de ${t.length} hechas` : 'Sin tareas todavía'}</small></button>`; }).join('')
+  : '<p class="vacio">No hay nada en esta lista. Pulsa «+ Entrada» para añadir ' + (vista === 'motor' ? 'un motor' : 'un coche') + '.</p>'}`;
+  document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { filtro = b.dataset.f; lista(); });
+  document.querySelectorAll('[data-id]').forEach(b => b.onclick = () => abrir(b.dataset.id));
+  $('#nuevo').onclick = () => { $('#n_tipo').value = vista; $('#dlg').showModal(); };
+  ligar();
+}
+async function abrir(id) {
+  selId = id; await cargarDetalle(); detalle();
+}
+function detalle() {
+  const v = vehs.find(x => x.id === selId); if (!v) return lista();
+  $('#app').innerHTML = `<header><button class="sec" id="atras">‹ Taller</button>${me.rol === 'admin' ? '<button class="sec" id="borrar">Eliminar</button>' : ''}</header>
+  <div class="box" style="border-left:8px solid var(--${v.estado})"><h2 style="margin:0">${esc(v.nombre)}</h2>
+  <small style="color:var(--mut)">${v.tipo === 'motor' ? 'Motor' : 'Coche'}${v.matricula ? ' · ' + esc(v.matricula) : ''}${v.cliente ? ' · ' + esc(v.cliente) : ''}</small>
+  <label for="est" style="display:block;margin-top:12px">Estado</label>
+  <select id="est">${ESTADOS.map(([k,n]) => `<option value="${k}" ${k===v.estado?'selected':''}>${n}</option>`).join('')}</select>
+  <label for="nt" style="display:block;margin-top:12px">Notas</label><textarea id="nt" rows="3">${esc(v.notas)}</textarea></div>
+  <div class="box"><h2 style="margin:0 0 6px">Checklist</h2>
+  ${tareas.length ? tareas.map(t => `<div class="tarea ${t.hecha?'ok':''}"><input type="checkbox" data-t="${t.id}" ${t.hecha?'checked':''} aria-label="Marcar hecha"><span>${esc(t.texto)}</span>${t.hecha && t.hecha_por ? `<small>${esc(t.hecha_por)}</small>` : ''}</div>`).join('') : '<p class="vacio">Aún no hay tareas. Añade la primera abajo.</p>'}
+  <div class="add"><input id="nueva" placeholder="Qué hay que hacer…" aria-label="Nueva tarea"><button class="acc" id="addt">Añadir</button></div></div>${piezasHtml()}${horasHtml(v)}${prefacturaHtml(v)}${historialHtml()}`;
+  $('#atras').onclick = () => { selId = null; lista(); };
+  $('#est').onchange = async e => { await sb.from('vehiculos').update({ estado: e.target.value }).eq('id', v.id); refrescar(); };
+  $('#nt').onblur = e => sb.from('vehiculos').update({ notas: e.target.value }).eq('id', v.id);
+  document.querySelectorAll('[data-t]').forEach(c => c.onchange = async () => {
+    await sb.from('tareas').update({ hecha: c.checked, hecha_por: c.checked ? me.nombre : null }).eq('id', c.dataset.t); refrescar();
+  });
+  const add = async () => { const t = $('#nueva').value.trim(); if (!t) return;
+    await sb.from('tareas').insert({ vehiculo_id: v.id, texto: t }); await refrescar(); $('#nueva')?.focus(); };
+  $('#addt').onclick = add; $('#nueva').onkeydown = e => { if (e.key === 'Enter') add(); };
+  ligarPiezas(v); ligarFase3(v);
+  if ($('#borrar')) $('#borrar').onclick = async () => {
+    if (confirm('¿Eliminar «' + v.nombre + '» y todas sus tareas? No se puede deshacer.')) { await sb.from('vehiculos').delete().eq('id', v.id); selId = null; refrescar(); } };
+}
+function piezasHtml() {
+  const filas = piezas.map(p => {
+    const a = alm.find(x => x.id === p.almacen_id);
+    let est = '<small class="warn">No está en el almacén: hay que pedirla</small>';
+    if (p.montada) est = '<small class="oks">Montada</small>';
+    else if (a) est = a.unidades >= p.cantidad ? `<small class="oks">En almacén: ${a.unidades} uds</small>` : `<small class="bad">Faltan: en almacén hay ${a.unidades} uds</small>`;
+    return `<div class="pieza">${p.foto && urls[p.foto] ? `<img src="${esc(urls[p.foto])}" alt="Foto de ${esc(p.nombre)}" data-big="${esc(urls[p.foto])}">` : '<div class="sinfoto"></div>'}
+    <div style="flex:1"><b>${p.cantidad} × ${esc(p.nombre)}</b>${est}
+    <div style="display:flex;gap:6px;margin-top:6px">${p.montada ? '' : `<button class="sec" data-m="${p.id}">${a ? 'Montar y descontar' : 'Marcar montada'}</button>`}<button class="sec" data-dp="${p.id}">Quitar</button></div></div></div>`;
+  }).join('');
+  return `<div class="box"><h2 style="margin:0 0 6px">Piezas necesarias</h2>${filas || '<p class="vacio">Aún no has añadido piezas.</p>'}
+  <label for="p_alm" style="display:block;margin-top:10px">Pieza del almacén</label>
+  <select id="p_alm"><option value="">— No está en el almacén / nueva —</option>${alm.map(a => `<option value="${a.id}">${esc(a.nombre)} (${a.unidades} uds)</option>`).join('')}</select>
+  <label for="p_nom" style="display:block;margin-top:10px">Nombre</label><input id="p_nom" placeholder="Ej. Kit de embrague">
+  <label for="p_cant" style="display:block;margin-top:10px">Cantidad</label><input id="p_cant" type="number" min="1" value="1">
+  <label for="p_foto" style="display:block;margin-top:10px">Foto (opcional)</label><input id="p_foto" type="file" accept="image/*">
+  <p class="err" id="p_err"></p><button class="acc" id="addp">Añadir pieza</button></div>`;
+}
+function ligarPiezas(v) {
+  $('#p_alm').onchange = e => { const a = alm.find(x => x.id === e.target.value); if (a) $('#p_nom').value = a.nombre; };
+  document.querySelectorAll('[data-big]').forEach(i => i.onclick = () => window.open(i.dataset.big));
+  document.querySelectorAll('[data-dp]').forEach(b => b.onclick = async () => { if (confirm('¿Quitar esta pieza?')) { await sb.from('piezas').delete().eq('id', b.dataset.dp); refrescar(); } });
+  document.querySelectorAll('[data-m]').forEach(b => b.onclick = async () => {
+    const p = piezas.find(x => x.id === b.dataset.m), a = alm.find(x => x.id === p.almacen_id);
+    const r = await sb.rpc('usar_pieza', { pid: p.id });
+    if (r.error || r.data === false) return alert('No hay unidades suficientes en el almacén.');
+    if (a) await sb.from('lineas_prefactura').insert({ vehiculo_id: p.vehiculo_id, tipo: 'Pieza', descripcion: p.nombre, cantidad: p.cantidad, precio: a.precio || 0 });
+    refrescar();
+  });
+  $('#addp').onclick = async () => {
+    const nombre = $('#p_nom').value.trim();
+    if (!nombre) { $('#p_err').textContent = 'Escribe el nombre de la pieza.'; return; }
+    $('#addp').disabled = true; let foto = null; const f = $('#p_foto').files[0];
+    if (f) {
+      foto = v.id + '/' + crypto.randomUUID() + '.jpg';
+      const up = await sb.storage.from('fotos').upload(foto, await comprimir(f), { contentType: 'image/jpeg' });
+      if (up.error) { $('#p_err').textContent = 'No se pudo subir la foto.'; $('#addp').disabled = false; return; }
+    }
+    await sb.from('piezas').insert({ vehiculo_id: v.id, nombre, cantidad: +$('#p_cant').value || 1, almacen_id: $('#p_alm').value || null, foto });
+    refrescar();
+  };
+}
+function comprimir(file) {
+  return new Promise(ok => { const img = new Image(); img.onload = () => {
+    const k = Math.min(1, 1280 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+    c.width = img.width * k; c.height = img.height * k; c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); c.toBlob(ok, 'image/jpeg', 0.7); };
+    img.src = URL.createObjectURL(file); });
+}
+const eur = n => (+n || 0).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+function totales(v) {
+  const base = lineas.reduce((s, l) => s + l.cantidad * l.precio, 0), dto = base * (v.descuento || 0) / 100, neto = base - dto, iva = neto * (v.iva ?? 21) / 100;
+  return { base, dto, iva, total: neto + iva };
+}
+function prefacturaHtml(v) {
+  const t = totales(v);
+  return `<div class="box"><h2 style="margin:0 0 6px">Prefactura</h2>
+  ${lineas.map(l => `<div class="tarea"><span style="flex:1"><small style="margin:0">${esc(l.tipo)}</small><br>${esc(l.descripcion)}</span><span>${+l.cantidad} × ${eur(l.precio)}</span><b>${eur(l.cantidad * l.precio)}</b><button class="sec" data-lp="${l.id}" aria-label="Cambiar precio">✎</button><button class="sec" data-dl="${l.id}" aria-label="Quitar línea">✕</button></div>`).join('') || '<p class="vacio">Sin líneas todavía.</p>'}
+  <div class="lin"><select id="l_tipo" aria-label="Tipo" style="width:auto"><option>Pieza</option><option>Mano de obra</option><option>Otros</option></select>
+  <input id="l_desc" placeholder="Descripción" aria-label="Descripción" style="flex:1;min-width:140px"><input id="l_cant" type="number" min="0.01" step="any" value="1" aria-label="Cantidad" style="width:72px"><input id="l_prec" type="number" min="0" step="0.01" placeholder="Precio €" aria-label="Precio" style="width:96px"></div>
+  <button class="acc" id="l_add" style="margin-top:8px">Añadir línea</button>
+  <div class="lin"><label>Descuento %<input id="v_dto" type="number" min="0" step="any" value="${v.descuento || 0}"></label><label>IVA %<input id="v_iva" type="number" min="0" step="any" value="${v.iva ?? 21}"></label></div>
+  <div class="tot"><span>Base</span><span>${eur(t.base)}</span></div><div class="tot"><span>Descuento</span><span>− ${eur(t.dto)}</span></div><div class="tot"><span>IVA</span><span>${eur(t.iva)}</span></div>
+  <div class="tot" style="font-size:20px;font-weight:700"><span>Total</span><span>${eur(t.total)}</span></div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><button class="sec" id="l_fac">Excel de factura</button><button class="sec" id="l_pre">Excel de presupuesto</button></div></div>`;
+}
+function historialHtml() {
+  return `<div class="box"><h2 style="margin:0 0 6px">Historial de mantenimiento</h2>
+  ${hist.map(h => `<div class="tarea" style="align-items:flex-start"><div style="flex:1"><small style="margin:0">${new Date(h.fecha).toLocaleDateString('es-ES')} · ${esc(h.autor)}</small><div style="white-space:pre-wrap">${esc(h.texto)}</div>${h.foto && urls[h.foto] ? `<img class="hfoto" src="${esc(urls[h.foto])}" alt="Foto del mantenimiento" data-big="${esc(urls[h.foto])}">` : ''}</div><button class="sec" data-dh="${h.id}" aria-label="Borrar anotación">✕</button></div>`).join('') || '<p class="vacio">Sin anotaciones todavía.</p>'}
+  <label for="h_txt" style="display:block;margin-top:10px">Nueva anotación</label><textarea id="h_txt" rows="4" placeholder="Qué se ha hecho, kilometraje, aceite…"></textarea>
+  <label for="h_foto" style="display:block;margin-top:10px">Foto (opcional)</label><input id="h_foto" type="file" accept="image/*">
+  <div class="add"><button class="sec" id="h_res">Resumir lo hecho</button><button class="acc" id="h_add">Guardar en el historial</button></div></div>`;
+}
+// Rellena TU plantilla (plantilla.xlsx, en la misma carpeta de la web) y la descarga
+async function exportarExcel(v, hoja) {
+  if (!lineas.length) return alert('Añade al menos una línea a la prefactura.');
+  if (lineas.length > 20) alert('La plantilla tiene sitio para 20 líneas: se exportarán las 20 primeras.');
+  try {
+    const r = await fetch('plantilla.xlsx'); if (!r.ok) throw new Error('plantilla');
+    const wb = new ExcelJS.Workbook(); await wb.xlsx.load(await r.arrayBuffer());
+    wb.removeWorksheet(hoja === 'Factura' ? 'Presupuesto' : 'Factura');
+    const ws = wb.getWorksheet(hoja), z = n => String(n).padStart(2, '0'), f = d => z(d.getDate()) + '/' + z(d.getMonth() + 1) + '/' + d.getFullYear();
+    ws.getCell('C10').value = v.cliente || ''; ws.getCell('G10').value = v.matricula || ''; ws.getCell('G11').value = v.nombre;
+    ws.getCell('G14').value = f(new Date(v.created_at)) + ' / ' + f(new Date());
+    lineas.slice(0, 20).forEach((l, i) => { const n = 17 + i;
+      ws.getCell('B' + n).value = l.tipo; ws.getCell('C' + n).value = l.descripcion; ws.getCell('E' + n).value = +l.cantidad;
+      ws.getCell('F' + n).value = +l.precio; ws.getCell('G' + n).value = (v.descuento || 0) / 100; ws.getCell('H' + n).value = (v.iva ?? 21) / 100; });
+    wb.calcProperties.fullCalcOnLoad = true;
+    const buf = await wb.xlsx.writeBuffer(), a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+    a.download = hoja + ' ' + (v.matricula || v.nombre) + '.xlsx'; a.click();
+  } catch (e) { alert('No se pudo crear el Excel. Comprueba que plantilla.xlsx está subido junto a index.html.'); }
+}
+function ligarFase3(v) {
+  const num = (id, d) => { const n = parseFloat($(id).value); return isNaN(n) ? d : n; };
+  $('#l_add').onclick = async () => {
+    const descripcion = $('#l_desc').value.trim(); if (!descripcion) return;
+    await sb.from('lineas_prefactura').insert({ vehiculo_id: v.id, tipo: $('#l_tipo').value, descripcion, cantidad: num('#l_cant', 1) || 1, precio: num('#l_prec', 0) }); refrescar();
+  };
+  document.querySelectorAll('[data-dl]').forEach(b => b.onclick = async () => { await sb.from('lineas_prefactura').delete().eq('id', b.dataset.dl); refrescar(); });
+  document.querySelectorAll('[data-lp]').forEach(b => b.onclick = async () => {
+    const l = lineas.find(x => x.id === b.dataset.lp), n = parseFloat(String(prompt('Precio por unidad (€):', l.precio) || '').replace(',', '.'));
+    if (!isNaN(n) && n >= 0) { await sb.from('lineas_prefactura').update({ precio: n }).eq('id', l.id); refrescar(); } });
+  $('#v_dto').onchange = async e => { const n = num('#v_dto', 0); e.target.blur(); await sb.from('vehiculos').update({ descuento: n }).eq('id', v.id); refrescar(); };
+  $('#v_iva').onchange = async e => { const n = num('#v_iva', 21); e.target.blur(); await sb.from('vehiculos').update({ iva: n }).eq('id', v.id); refrescar(); };
+  const mia = fich.find(f => !f.fin && f.usuario === me.nombre);
+  if ($('#f_start')) $('#f_start').onclick = async () => { await sb.from('fichajes').insert({ vehiculo_id: v.id, usuario: me.nombre, inicio: new Date().toISOString() }); refrescar(); };
+  if ($('#f_stop')) $('#f_stop').onclick = async () => { await sb.from('fichajes').update({ fin: new Date().toISOString() }).eq('id', mia.id); refrescar(); };
+  $('#f_man').onclick = async () => {
+    const h = parseFloat(String(prompt('¿Cuántas horas quieres añadir? (ej. 1,5)') || '').replace(',', '.'));
+    if (h > 0) { await sb.from('fichajes').insert({ vehiculo_id: v.id, usuario: me.nombre, inicio: new Date(Date.now() - h * 36e5).toISOString(), fin: new Date().toISOString() }); refrescar(); } };
+  if ($('#h_tar')) $('#h_tar').onclick = async () => {
+    const n = parseFloat(String(prompt('Precio por hora de mano de obra (€):', tarifa) || '').replace(',', '.'));
+    if (!isNaN(n) && n >= 0) { await sb.from('ajustes').upsert({ clave: 'precio_hora', valor: n }); refrescar(); } };
+  if ($('#f_fact')) $('#f_fact').onclick = async () => {
+    const cer = fich.filter(f => !f.facturado && f.fin); const h = cer.reduce((s, f) => s + durH(f), 0);
+    if (!tarifa && !confirm('El precio por hora está sin establecer (0 €). ¿Pasar las horas igualmente?')) return;
+    await sb.from('lineas_prefactura').insert({ vehiculo_id: v.id, tipo: 'Mano de obra', descripcion: 'Horas de trabajo', cantidad: Math.round(h * 100) / 100, precio: tarifa });
+    await sb.from('fichajes').update({ facturado: true }).in('id', cer.map(f => f.id)); refrescar(); };
+  $('#l_fac').onclick = () => exportarExcel(v, 'Factura');
+  $('#l_pre').onclick = () => exportarExcel(v, 'Presupuesto');
+  $('#h_res').onclick = () => {
+    const hechas = tareas.filter(t => t.hecha).map(t => '- ' + t.texto), mont = piezas.filter(p => p.montada).map(p => '- ' + p.cantidad + ' × ' + p.nombre);
+    $('#h_txt').value = (hechas.length ? 'Trabajos hechos:\n' + hechas.join('\n') : '') + (mont.length ? '\n\nPiezas montadas:\n' + mont.join('\n') : '');
+  };
+  $('#h_add').onclick = async () => {
+    const texto = $('#h_txt').value.trim(); if (!texto) return;
+    $('#h_add').disabled = true; let foto = null; const f = $('#h_foto').files[0];
+    if (f) {
+      foto = v.id + '/h-' + crypto.randomUUID() + '.jpg';
+      const up = await sb.storage.from('fotos').upload(foto, await comprimir(f), { contentType: 'image/jpeg' });
+      if (up.error) { alert('No se pudo subir la foto.'); $('#h_add').disabled = false; return; }
+    }
+    await sb.from('historial').insert({ vehiculo_id: v.id, texto, autor: me.nombre, foto }); refrescar();
+  };
+  document.querySelectorAll('[data-dh]').forEach(b => b.onclick = async () => { if (confirm('¿Borrar esta anotación del historial?')) { await sb.from('historial').delete().eq('id', b.dataset.dh); refrescar(); } });
+}
+const hms = ms => { const t = Math.max(0, Math.floor(ms / 1000)), z = n => String(n).padStart(2, '0'); return Math.floor(t / 3600) + ':' + z(Math.floor(t % 3600 / 60)) + ':' + z(t % 60); };
+const durH = f => ((f.fin ? new Date(f.fin) : new Date()) - new Date(f.inicio)) / 36e5;
+const fmtH = h => { const m = Math.round(h * 60); return Math.floor(m / 60) + ' h ' + (m % 60) + ' min'; };
+function horasHtml(v) {
+  const mia = fich.find(f => !f.fin && f.usuario === me.nombre), pend = fich.filter(f => !f.facturado), cer = pend.filter(f => f.fin).reduce((s, f) => s + durH(f), 0);
+  return `<div class="box"><h2 style="margin:0 0 6px">Horas de trabajo</h2>
+  <p style="margin:0 0 8px;color:var(--mut)">Precio por hora: <b style="color:var(--ink)">${tarifa ? eur(tarifa) + '/h' : 'sin establecer'}</b>${me.rol === 'admin' ? ' <button class="sec" id="h_tar">Cambiar</button>' : ''}</p>
+  <div class="reloj" id="reloj" data-ini="${mia ? mia.inicio : ''}">${hms(mia ? Date.now() - new Date(mia.inicio) : 0)}</div>
+  ${mia ? '<button class="acc" id="f_stop">Parar</button>' : '<button class="acc" id="f_start">Empezar a contar</button>'} <button class="sec" id="f_man">+ Horas a mano</button>
+  <div class="tot" style="margin-top:10px"><span>Horas sin facturar</span><b>${fmtH(pend.reduce((s, f) => s + durH(f), 0))}</b></div>
+  ${cer >= 0.01 ? `<button class="sec" id="f_fact">Pasar ${fmtH(cer)} a la prefactura (${eur(cer * tarifa)})</button>` : ''}</div>`;
+}
+setInterval(() => { const r = $('#reloj'); if (r && r.dataset.ini) r.textContent = hms(Date.now() - new Date(r.dataset.ini)); }, 1000);
+const z2 = n => String(n).padStart(2, '0'), iso = d => d.getFullYear() + '-' + z2(d.getMonth() + 1) + '-' + z2(d.getDate()), hoyISO = () => iso(new Date());
+const dias = f => f ? Math.round((new Date(f + 'T00:00:00') - new Date(new Date().toDateString())) / 864e5) : null;
+const estF = f => { const d = dias(f); return d === null ? '' : d < 0 ? 'bad' : d <= 30 ? 'warn' : 'oks'; };
+const fechaES = f => f ? new Date(f + 'T00:00:00').toLocaleDateString('es-ES') : '—';
+const textoD = f => { const d = dias(f); return d === null ? 'sin fecha' : d < 0 ? 'caducada hace ' + (-d) + ' d' : d === 0 ? 'vence hoy' : 'en ' + d + ' d'; };
+
+function agendaView() {
+  selId = null; dia = dia || hoyISO();
+  const y = mes.getFullYear(), m = mes.getMonth(), off = (new Date(y, m, 1).getDay() + 6) % 7, n = new Date(y, m + 1, 0).getDate(), hoy = hoyISO();
+  const delDia = agenda.filter(x => x.fecha === dia), pend = agenda.filter(x => x.tipo === 'tarea' && !x.hecha).slice(0, 15);
+  const celdas = Array(off).fill('<span></span>').concat(Array.from({ length: n }, (_, i) => { const d = y + '-' + z2(m + 1) + '-' + z2(i + 1), it = agenda.filter(x => x.fecha === d);
+    return `<button class="${d === hoy ? 'hoy' : ''} ${d === dia ? 'sel' : ''}" data-d="${d}" aria-label="Día ${i + 1}">${i + 1}<span class="p">${it.slice(0, 3).map(x => `<i class="${x.tipo === 'tarea' ? 't' : ''}"></i>`).join('')}</span></button>`; })).join('');
+  const fila = x => { const v = vehs.find(q => q.id === x.vehiculo_id), tarde = x.tipo === 'tarea' && !x.hecha && x.fecha < hoy;
+    return `<div class="tarea ${x.hecha ? 'ok' : ''}">${x.tipo === 'tarea' ? `<input type="checkbox" data-ag="${x.id}" ${x.hecha ? 'checked' : ''} aria-label="Marcar hecha">` : '<span aria-hidden="true">📅</span>'}
+    <div style="flex:1"><span>${x.hora ? x.hora.slice(0, 5) + ' · ' : ''}${esc(x.titulo)}</span><small style="margin:0;display:block;${tarde ? 'color:#ff6b6b' : ''}">${fechaES(x.fecha)}${x.asignado ? ' · ' + esc(x.asignado) : ''}${v ? ' · ' + esc(v.nombre) : ''}${tarde ? ' · atrasada' : ''}</small>${x.notas ? `<small style="margin:0;display:block">${esc(x.notas)}</small>` : ''}</div>
+    <button class="sec" data-dag="${x.id}" aria-label="Borrar">✕</button></div>`; };
+  $('#app').innerHTML = `${cabecera()}
+  <div class="box"><div class="row" style="align-items:center"><button class="sec" id="mp" aria-label="Mes anterior">‹</button><h2 style="margin:0;text-transform:capitalize">${mes.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</h2><button class="sec" id="ms" aria-label="Mes siguiente">›</button></div>
+  <div class="cal" style="margin-top:10px">${['L', 'M', 'X', 'J', 'V', 'S', 'D'].map(d => `<b>${d}</b>`).join('')}${celdas}</div></div>
+  <div class="box"><h2 style="margin:0 0 6px">${fechaES(dia)}</h2>${delDia.map(fila).join('') || '<p class="vacio">Nada apuntado este día.</p>'}
+  <div class="lin"><select id="ag_tipo" style="width:auto" aria-label="Tipo"><option value="evento">Evento</option><option value="tarea">Tarea</option></select><input id="ag_tit" placeholder="Ej. Entregar el Saxo" aria-label="Título" style="flex:1;min-width:150px"><input id="ag_hora" type="time" aria-label="Hora" style="width:112px"></div>
+  <div class="lin"><select id="ag_asig" aria-label="Asignado a" style="flex:1"><option value="">Todo el equipo</option>${equipo.map(q => `<option>${esc(q)}</option>`).join('')}</select><select id="ag_veh" aria-label="Vehículo" style="flex:1"><option value="">Sin vehículo</option>${vehs.filter(q => q.estado !== 'entregado').map(q => `<option value="${q.id}">${esc(q.nombre)}</option>`).join('')}</select></div>
+  <input id="ag_notas" placeholder="Notas (opcional)" aria-label="Notas" style="margin-top:6px"><button class="acc" id="ag_add" style="margin-top:8px">Añadir al ${fechaES(dia)}</button></div>
+  <div class="box"><h2 style="margin:0 0 6px">Tareas pendientes</h2>${pend.map(fila).join('') || '<p class="vacio">No hay tareas pendientes.</p>'}</div>`;
+  ligar();
+  $('#mp').onclick = () => { mes = new Date(y, m - 1, 1); agendaView(); };
+  $('#ms').onclick = () => { mes = new Date(y, m + 1, 1); agendaView(); };
+  document.querySelectorAll('[data-d]').forEach(b => b.onclick = () => { dia = b.dataset.d; agendaView(); });
+  document.querySelectorAll('[data-ag]').forEach(c => c.onchange = async () => { await sb.from('agenda').update({ hecha: c.checked }).eq('id', c.dataset.ag); refrescar(); });
+  document.querySelectorAll('[data-dag]').forEach(b => b.onclick = async () => { if (confirm('¿Borrar esto de la agenda?')) { await sb.from('agenda').delete().eq('id', b.dataset.dag); refrescar(); } });
+  $('#ag_add').onclick = async () => {
+    const titulo = $('#ag_tit').value.trim(); if (!titulo) return;
+    await sb.from('agenda').insert({ tipo: $('#ag_tipo').value, titulo, fecha: dia, hora: $('#ag_hora').value || null, asignado: $('#ag_asig').value || null, vehiculo_id: $('#ag_veh').value || null, notas: $('#ag_notas').value.trim() || null, creado_por: me.nombre }); refrescar();
+  };
+}
+
+function flotaView() {
+  selFlota = null;
+  $('#app').innerHTML = `${cabecera()}<div style="margin-bottom:12px"><button class="acc" id="nuevof">+ Vehículo de asistencia</button></div>
+  ${flota.length ? flota.map(f => { const aviso = [f.itv_fecha, f.seguro_fecha].some(d => d && dias(d) <= 30); return `<button class="fila" style="--c:var(--${aviso ? 'esperando_piezas' : 'listo'})" data-fl="${f.id}">
+    <div class="row"><b>${esc(f.nombre)}</b><span class="tag">${esc(f.tipo)}</span></div>
+    <small>${f.matricula ? esc(f.matricula) + ' · ' : ''}${f.km != null ? f.km.toLocaleString('es-ES') + ' km' : 'sin kilómetros'}</small>
+    <small>ITV: <span class="${estF(f.itv_fecha)}">${fechaES(f.itv_fecha)} (${textoD(f.itv_fecha)})</span></small>
+    <small>Seguro: <span class="${estF(f.seguro_fecha)}">${fechaES(f.seguro_fecha)} (${textoD(f.seguro_fecha)})</span></small></button>`; }).join('')
+  : '<p class="vacio">Añade aquí la furgoneta, el remolque o el coche de alquiler del equipo.</p>'}`;
+  ligar();
+  $('#nuevof').onclick = () => $('#dlgf').showModal();
+  document.querySelectorAll('[data-fl]').forEach(b => b.onclick = () => { selFlota = b.dataset.fl; refrescar(); });
+}
+async function firmar(list) {
+  const falta = list.filter(f => f && !urls[f]);
+  if (falta.length) { const r = await sb.storage.from('fotos').createSignedUrls(falta, 86400); (r.data || []).forEach(o => { if (o.signedUrl) urls[o.path] = o.signedUrl; }); }
+}
+async function cargarFlota() {
+  const r = await sb.from('flota_mant').select('*').eq('flota_id', selFlota).order('fecha', { ascending: false }).order('created_at', { ascending: false });
+  fm = r.data || []; await firmar(fm.map(x => x.foto));
+}
+function flotaDetalle() {
+  const f = flota.find(x => x.id === selFlota); if (!f) { selFlota = null; return flotaView(); }
+  const total = fm.reduce((s, x) => s + (+x.coste || 0), 0);
+  $('#app').innerHTML = `<header><button class="sec" id="atrasf">‹ Flota</button>${me.rol === 'admin' ? '<button class="sec" id="borrarf">Eliminar</button>' : ''}</header>
+  <div class="box"><h2 style="margin:0">${esc(f.nombre)}</h2><small style="color:var(--mut)">${esc(f.tipo)}${f.matricula ? ' · ' + esc(f.matricula) : ''}</small>
+  <label for="fk" style="display:block;margin-top:12px">Kilómetros actuales</label><input id="fk" type="number" min="0" value="${f.km ?? ''}">
+  <label for="fi" style="display:block;margin-top:12px">Próxima ITV <span class="${estF(f.itv_fecha)}">· ${textoD(f.itv_fecha)}</span></label><input id="fi" type="date" value="${f.itv_fecha || ''}">
+  <label for="fs" style="display:block;margin-top:12px">Vencimiento del seguro <span class="${estF(f.seguro_fecha)}">· ${textoD(f.seguro_fecha)}</span></label><input id="fs" type="date" value="${f.seguro_fecha || ''}"></div>
+  <div class="box"><h2 style="margin:0 0 6px">Historial de mantenimiento</h2>${fm.length ? `<small style="color:var(--mut)">Gasto total anotado: ${eur(total)}</small>` : ''}
+  ${fm.map(x => `<div class="tarea" style="align-items:flex-start"><div style="flex:1"><small style="margin:0">${fechaES(x.fecha)}${x.km ? ' · ' + x.km.toLocaleString('es-ES') + ' km' : ''}${+x.coste ? ' · ' + eur(x.coste) : ''} · ${esc(x.autor)}</small><div style="white-space:pre-wrap">${esc(x.texto)}</div>${x.foto && urls[x.foto] ? `<img class="hfoto" src="${esc(urls[x.foto])}" alt="Foto del mantenimiento" data-big="${esc(urls[x.foto])}">` : ''}</div><button class="sec" data-dfm="${x.id}" aria-label="Borrar anotación">✕</button></div>`).join('') || '<p class="vacio">Sin mantenimientos anotados.</p>'}
+  <div class="lin"><label>Fecha<input id="m_fec" type="date" value="${hoyISO()}"></label><label>Km<input id="m_km" type="number" min="0" value="${f.km ?? ''}"></label><label>Coste €<input id="m_cos" type="number" min="0" step="0.01"></label></div>
+  <label for="m_txt" style="display:block;margin-top:10px">Qué se ha hecho</label><textarea id="m_txt" rows="3" placeholder="Aceite y filtros, neumáticos, frenos…"></textarea>
+  <label for="m_foto" style="display:block;margin-top:10px">Foto (opcional)</label><input id="m_foto" type="file" accept="image/*"><button class="acc" id="m_add" style="margin-top:10px">Guardar mantenimiento</button></div>`;
+  $('#atrasf').onclick = () => { selFlota = null; flotaView(); };
+  document.querySelectorAll('[data-big]').forEach(i => i.onclick = () => window.open(i.dataset.big));
+  const upd = (id, k, fn) => $(id).onchange = async e => { e.target.blur(); await sb.from('flota').update({ [k]: fn(e.target.value) }).eq('id', f.id); refrescar(); };
+  upd('#fk', 'km', x => parseInt(x) || null); upd('#fi', 'itv_fecha', x => x || null); upd('#fs', 'seguro_fecha', x => x || null);
+  document.querySelectorAll('[data-dfm]').forEach(b => b.onclick = async () => { if (confirm('¿Borrar esta anotación?')) { await sb.from('flota_mant').delete().eq('id', b.dataset.dfm); refrescar(); } });
+  $('#m_add').onclick = async () => {
+    const texto = $('#m_txt').value.trim(); if (!texto) return;
+    $('#m_add').disabled = true; let foto = null; const fl = $('#m_foto').files[0];
+    if (fl) {
+      foto = 'flota/' + f.id + '/' + crypto.randomUUID() + '.jpg';
+      const up = await sb.storage.from('fotos').upload(foto, await comprimir(fl), { contentType: 'image/jpeg' });
+      if (up.error) { alert('No se pudo subir la foto.'); $('#m_add').disabled = false; return; }
+    }
+    const km = parseInt($('#m_km').value) || null;
+    await sb.from('flota_mant').insert({ flota_id: f.id, fecha: $('#m_fec').value || hoyISO(), km, texto, coste: parseFloat($('#m_cos').value) || null, foto, autor: me.nombre });
+    if (km && km > (f.km || 0)) await sb.from('flota').update({ km }).eq('id', f.id);
+    refrescar();
+  };
+  if ($('#borrarf')) $('#borrarf').onclick = async () => { if (confirm('¿Eliminar «' + f.nombre + '» y todo su historial?')) { await sb.from('flota').delete().eq('id', f.id); selFlota = null; refrescar(); } };
+}
+$('#f_cancel').onclick = () => $('#dlgf').close();
+$('#fnuevof').onsubmit = async () => {
+  await sb.from('flota').insert({ nombre: $('#f_nom').value.trim(), tipo: $('#f_tipo').value, matricula: $('#f_mat').value.trim() || null, km: parseInt($('#f_km').value) || null, itv_fecha: $('#f_itv').value || null, seguro_fecha: $('#f_seg').value || null });
+  $('#fnuevof').reset(); refrescar();
+};
+function almacenView() {
+  selId = null;
+  const orden = [...alm].sort((x, y) => (y.unidades <= y.minimo) - (x.unidades <= x.minimo));
+  $('#app').innerHTML = `${cabecera()}<div style="margin-bottom:12px"><button class="acc" id="nuevoa">+ Pieza al almacén</button></div>
+  ${orden.length ? orden.map(a => { const bajo = a.unidades <= a.minimo; return `<div class="fila" style="--c:${bajo ? '#d23b3b' : 'var(--listo)'}">
+    <div class="row"><b>${esc(a.nombre)}</b><span class="tag">${bajo ? '⚠ Stock bajo' : 'OK'}</span></div>
+    <small>${a.referencia ? 'Ref. ' + esc(a.referencia) + ' · ' : ''}${a.ubicacion ? esc(a.ubicacion) + ' · ' : ''}Avisa con ${a.minimo} o menos · Venta: ${eur(a.precio)}</small>
+    <div class="row" style="margin-top:8px;align-items:center"><div><button class="sec" data-u="${a.id}" data-d="-1" aria-label="Quitar una unidad">−</button><b style="font-size:22px;margin:0 10px">${a.unidades}</b><button class="sec" data-u="${a.id}" data-d="1" aria-label="Añadir una unidad">+</button></div>
+    <div><button class="sec" data-min="${a.id}">Mínimo</button> <button class="sec" data-pre="${a.id}">Precio</button>${me.rol === 'admin' ? ` <button class="sec" data-da="${a.id}">Quitar</button>` : ''}</div></div></div>`; }).join('')
+  : '<p class="vacio">El almacén está vacío. Añade la primera pieza.</p>'}`;
+  ligar();
+  $('#nuevoa').onclick = () => $('#dlga').showModal();
+  document.querySelectorAll('[data-u]').forEach(b => b.onclick = async () => {
+    const a = alm.find(x => x.id === b.dataset.u);
+    await sb.from('almacen').update({ unidades: Math.max(0, a.unidades + +b.dataset.d) }).eq('id', a.id); refrescar(); });
+  document.querySelectorAll('[data-min]').forEach(b => b.onclick = async () => {
+    const a = alm.find(x => x.id === b.dataset.min), n = prompt('Avisar cuando queden este número de unidades o menos:', a.minimo);
+    if (n !== null && n.trim() !== '' && !isNaN(n)) { await sb.from('almacen').update({ minimo: Math.max(0, +n) }).eq('id', a.id); refrescar(); } });
+  document.querySelectorAll('[data-pre]').forEach(b => b.onclick = async () => {
+    const a = alm.find(x => x.id === b.dataset.pre), n = parseFloat(String(prompt('Precio de venta por unidad (€):', a.precio) || '').replace(',', '.'));
+    if (!isNaN(n) && n >= 0) { await sb.from('almacen').update({ precio: n }).eq('id', a.id); refrescar(); } });
+  document.querySelectorAll('[data-da]').forEach(b => b.onclick = async () => {
+    if (confirm('¿Quitar esta pieza del almacén?')) { await sb.from('almacen').delete().eq('id', b.dataset.da); refrescar(); } });
+}
+$('#a_cancel').onclick = () => $('#dlga').close();
+$('#fnuevoa').onsubmit = async () => {
+  await sb.from('almacen').insert({ nombre: $('#a_nom').value.trim(), referencia: $('#a_ref').value.trim() || null, ubicacion: $('#a_ubi').value.trim() || null, unidades: +$('#a_uni').value || 0, minimo: +$('#a_min').value || 0, precio: parseFloat($('#a_pre').value) || 0 });
+  $('#fnuevoa').reset(); refrescar();
+};
+$('#n_cancel').onclick = () => $('#dlg').close();
+$('#fnuevo').onsubmit = async () => {
+  await sb.from('vehiculos').insert({ tipo: $('#n_tipo').value, nombre: $('#n_nombre').value.trim(), matricula: $('#n_mat').value.trim() || null, cliente: $('#n_cli').value.trim() || null });
+  $('#fnuevo').reset(); refrescar();
+};
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+boot();
+</script>
+</body>
+</html>
